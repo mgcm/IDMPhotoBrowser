@@ -197,7 +197,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 		{
 			_applicationTopViewController = [self topviewController];
 			_previousModalPresentationStyle = _applicationTopViewController.modalPresentationStyle;
-			_applicationTopViewController.modalPresentationStyle = UIModalPresentationCurrentContext;
+			_applicationTopViewController.modalPresentationStyle = UIModalPresentationFullScreen;
 			self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
 		}
 		
@@ -436,7 +436,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     if (!imageFromView && [scrollView.photo respondsToSelector:@selector(placeholderImage)]) {
         imageFromView = [scrollView.photo placeholderImage];
     }
-    
+
     //imageFromView = [self rotateImageToCurrentOrientation:imageFromView];
     
     CGRect screenBound = [[UIScreen mainScreen] bounds];
@@ -677,6 +677,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     [super viewDidAppear:animated];
     _viewIsActive = YES;
 }
+
 
 // Release any retained subviews of the main view.
 - (void)viewDidUnload {

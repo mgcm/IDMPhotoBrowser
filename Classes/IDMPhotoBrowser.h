@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 #import <MessageUI/MessageUI.h>
+#import <Haneke/Haneke.h>
+#import <FLAnimatedImage/FLAnimatedImage.h>
 
 #import "IDMPhoto.h"
 #import "IDMPhotoProtocol.h"

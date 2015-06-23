@@ -8,5 +8,7 @@ target "PhotoBrowserDemo" do
 pod 'AFNetworking'
 pod 'DACircularProgress'
 pod 'pop'
+pod 'Haneke'
+pod 'FLAnimatedImage'
 
 end
