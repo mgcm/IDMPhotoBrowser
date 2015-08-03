@@ -264,6 +264,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     [super didReceiveMemoryWarning];
 }
 
+
 #pragma mark - Pan Gesture
 
 - (void)panGestureRecognized:(id)sender {
@@ -357,29 +358,13 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 
 #pragma mark - Animation
 
-- (UIImage*)rotateImageToCurrentOrientation:(UIImage*)image
-{
-    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation))
-    {
-        UIImageOrientation orientation = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft) ?UIImageOrientationLeft : UIImageOrientationRight;
-        
-        UIImage *rotatedImage = [[UIImage alloc] initWithCGImage:image.CGImage
-                                                           scale:1.0
-                                                     orientation:orientation];
-        
-        image = rotatedImage;
-    }
-    
-    return image;
-}
 
 - (void)performPresentAnimation {
     self.view.alpha = 0.0f;
     _pagingScrollView.alpha = 0.0f;
     
     UIImage *imageFromView = _scaleImage ? _scaleImage : [self getImageFromView:_senderViewForAnimation];
-    imageFromView = [self rotateImageToCurrentOrientation:imageFromView];
-    
+
     _senderViewOriginalFrame = [_senderViewForAnimation.superview convertRect:_senderViewForAnimation.frame toView:nil];
     
     CGRect screenBound = [[UIScreen mainScreen] bounds];
@@ -411,8 +396,19 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     } completion:nil];
     
     float scaleFactor = (imageFromView ? imageFromView.size.width : screenWidth) / screenWidth;
-    CGRect finalImageViewFrame = CGRectMake(0, (screenHeight/2)-((imageFromView.size.height / scaleFactor)/2), screenWidth, imageFromView.size.height / scaleFactor);
-    
+    CGRect finalImageViewFrame = CGRectMake(0,
+                                            ceil((screenHeight/2)-((imageFromView.size.height / scaleFactor)/2)),
+                                            screenWidth,
+                                            ceil(imageFromView.size.height / scaleFactor));
+    if (screenWidth > screenHeight) {
+        scaleFactor = (imageFromView ? imageFromView.size.height : screenHeight) / screenHeight;
+        finalImageViewFrame = CGRectMake(ceil((screenWidth/2)-((imageFromView.size.width / scaleFactor)/2)),
+                                         0,
+                                         ceil(imageFromView.size.width / scaleFactor),
+                                         screenHeight);
+
+    }
+
     if(_usePopAnimation)
     {
         [self animateView:resizableImageView
@@ -437,22 +433,20 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
         imageFromView = [scrollView.photo placeholderImage];
     }
 
-    //imageFromView = [self rotateImageToCurrentOrientation:imageFromView];
-    
     CGRect screenBound = [[UIScreen mainScreen] bounds];
     CGFloat screenWidth = screenBound.size.width;
     CGFloat screenHeight = screenBound.size.height;
-    
-    float scaleFactor = imageFromView.size.width / screenWidth;
-    
+
+    CGRect finalImageViewFrame = [scrollView.superview convertRect:scrollView.frame toView:nil];;
+
     UIView *fadeView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenWidth, screenHeight)];
     fadeView.backgroundColor = self.useWhiteBackgroundColor ? [UIColor whiteColor] : [UIColor blackColor];
     fadeView.alpha = fadeAlpha;
     [_applicationWindow addSubview:fadeView];
     
     UIImageView *resizableImageView = [[UIImageView alloc] initWithImage:imageFromView];
-    resizableImageView.frame = (imageFromView) ? CGRectMake(0, (screenHeight/2)-((imageFromView.size.height / scaleFactor)/2)+scrollView.frame.origin.y, screenWidth, imageFromView.size.height / scaleFactor) : CGRectZero;
-    resizableImageView.contentMode = UIViewContentModeScaleAspectFill;
+    resizableImageView.frame = finalImageViewFrame;
+    resizableImageView.contentMode = UIViewContentModeScaleAspectFit;
     resizableImageView.backgroundColor = [UIColor clearColor];
     resizableImageView.clipsToBounds = YES;
     [_applicationWindow addSubview:resizableImageView];
